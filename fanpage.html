@@ -1,0 +1,1161 @@
+<!doctype html>
+<!--
+  ============================================================================
+  IS216 - Fan Page Assignment
+  Subject: Oscar Piastri (Formula 1 driver, McLaren, car #81)
+  Tech: Pure HTML + vanilla CSS + vanilla JavaScript. No frameworks/libraries.
+  ============================================================================
+  HOW THIS FILE IS ORGANISED
+    1. <head>      -> page settings + all the CSS (inside <style>)
+    2. <body>      -> the visible content (structure/meaning only)
+    3. <script>    -> all the interactivity (at the very bottom)
+  Everything lives in one file so you can just open it with Live Server.
+  Search for "SECTION" comments to jump around.
+-->
+<html lang="en" data-theme="race">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Oscar Piastri · #81 · Fan Page</title>
+
+		<!-- Google Fonts. This is the ONE external thing we load (just fonts, not a
+       framework). Anton = bold poster/motorsport display face.
+       Archivo = clean body text. Space Mono = "timing screen" data look. -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<style>
+			/* ======================================================================
+       SECTION 1 — THEME VARIABLES (the colour system)
+       Each theme just redefines these variables. The rest of the CSS reads
+       from them, so the whole page re-colours when we change data-theme.
+       ====================================================================== */
+
+			/* Default theme: "Night Race" — dark carbon with papaya */
+			:root,
+			[data-theme='race'] {
+				--papaya: #ff6a00; /* McLaren papaya orange */
+				--papaya-soft: #ff8c3a;
+				--bg: #0c0c0e; /* carbon black background */
+				--surface: #16161a; /* cards sit slightly lighter than bg */
+				--text: #f4f2ee; /* main text (off-white) */
+				--muted: #9a9aa2; /* quieter text */
+				--line: #26262c; /* hairline borders */
+			}
+
+			/* Theme 2: "Daylight" — clean light layout */
+			[data-theme='day'] {
+				--papaya: #f5540a;
+				--papaya-soft: #ff7a2e;
+				--bg: #f5f4f1;
+				--surface: #ffffff;
+				--text: #16161a;
+				--muted: #6a6a72;
+				--line: #e2e1dc;
+			}
+
+			/* Theme 3: "Papaya" — orange-forward, loud and fun */
+			[data-theme='papaya'] {
+				--papaya: #16161a; /* flip it: ink becomes the "accent" on orange */
+				--papaya-soft: #3a2a1a;
+				--bg: #ff6a00;
+				--surface: #ff7d1e;
+				--text: #160b02;
+				--muted: #5a3410;
+				--line: #e05c00;
+			}
+
+			/* ======================================================================
+       SECTION 2 — BASE / RESET
+       ====================================================================== */
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			html {
+				scroll-behavior: smooth;
+			}
+
+			body {
+				background: var(--bg);
+				color: var(--text);
+				font-family: 'Archivo', system-ui, sans-serif;
+				line-height: 1.6;
+				/* smooth colour change when switching themes */
+				transition:
+					background 0.35s ease,
+					color 0.35s ease;
+			}
+
+			/* Respect users who prefer less motion (accessibility) */
+			@media (prefers-reduced-motion: reduce) {
+				html {
+					scroll-behavior: auto;
+				}
+				* {
+					transition: none !important;
+					animation: none !important;
+				}
+			}
+
+			.wrap {
+				width: min(1000px, 92%);
+				margin: 0 auto;
+			}
+
+			section {
+				padding: 84px 0;
+				border-top: 1px solid var(--line);
+			}
+
+			/* A small "eyebrow" label used above section titles.
+       Mono font + wide letter-spacing = timing-screen vibe. */
+			.eyebrow {
+				font-family: 'Space Mono', monospace;
+				font-size: 0.75rem;
+				letter-spacing: 0.35em;
+				text-transform: uppercase;
+				color: var(--papaya);
+			}
+			[data-theme='papaya'] .eyebrow {
+				color: var(--text);
+			}
+
+			h2.title {
+				font-family: 'Anton', sans-serif;
+				font-weight: 400;
+				font-size: clamp(2rem, 6vw, 3.4rem);
+				letter-spacing: 0.01em;
+				text-transform: uppercase;
+				margin: 8px 0 28px;
+				line-height: 1;
+			}
+
+			/* ======================================================================
+       SECTION 3 — NAV BAR (with the theme switcher buttons)
+       ====================================================================== */
+			header.nav {
+				position: sticky;
+				top: 0;
+				z-index: 20;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 14px 0;
+				background: color-mix(in srgb, var(--bg) 86%, transparent);
+				backdrop-filter: blur(8px);
+				border-bottom: 1px solid var(--line);
+			}
+			.brand {
+				font-family: 'Anton', sans-serif;
+				font-size: 1.25rem;
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+			}
+			.brand span {
+				color: var(--papaya);
+			}
+			[data-theme='papaya'] .brand span {
+				color: var(--text);
+				text-decoration: underline;
+			}
+
+			.themes {
+				display: flex;
+				gap: 8px;
+			}
+			.themes button {
+				font-family: 'Space Mono', monospace;
+				font-size: 0.72rem;
+				letter-spacing: 0.08em;
+				padding: 7px 12px;
+				background: transparent;
+				color: var(--muted);
+				border: 1px solid var(--line);
+				border-radius: 999px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+			.themes button:hover {
+				color: var(--text);
+				border-color: var(--papaya);
+			}
+			/* the currently active theme button */
+			.themes button.active {
+				color: var(--bg);
+				background: var(--papaya);
+				border-color: var(--papaya);
+			}
+			[data-theme='papaya'] .themes button.active {
+				color: var(--bg);
+				background: var(--text);
+			}
+
+			/* ======================================================================
+       SECTION 4 — HERO (the big opening statement)
+       The signature element is the giant "81" living behind the name.
+       ====================================================================== */
+			.hero {
+				position: relative;
+				overflow: hidden;
+				padding: 96px 0 80px;
+			}
+
+			/* The giant background "81" — his identity number */
+			.hero-number {
+				position: absolute;
+				right: -3%;
+				top: 50%;
+				transform: translateY(-50%);
+				font-family: 'Anton', sans-serif;
+				font-size: clamp(14rem, 42vw, 32rem);
+				line-height: 0.8;
+				color: var(--papaya);
+				opacity: 0.14;
+				pointer-events: none;
+				user-select: none;
+			}
+
+			/* Diagonal papaya "speed stripe" accent */
+			.hero::before {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background: linear-gradient(
+					115deg,
+					transparent 60%,
+					color-mix(in srgb, var(--papaya) 22%, transparent) 60%,
+					color-mix(in srgb, var(--papaya) 22%, transparent) 64%,
+					transparent 64%
+				);
+				pointer-events: none;
+			}
+
+			.hero-content {
+				position: relative;
+				z-index: 2;
+				max-width: 640px;
+			}
+			.flag {
+				font-family: 'Space Mono', monospace;
+				letter-spacing: 0.2em;
+				color: var(--muted);
+				font-size: 0.8rem;
+			}
+
+			.hero h1 {
+				font-family: 'Anton', sans-serif;
+				font-weight: 400;
+				font-size: clamp(3rem, 12vw, 7rem);
+				line-height: 0.9;
+				text-transform: uppercase;
+				margin: 10px 0 6px;
+			}
+			.hero h1 .last {
+				color: var(--papaya);
+				display: block;
+			}
+			[data-theme='papaya'] .hero h1 .last {
+				color: var(--text);
+			}
+
+			.tagline {
+				font-size: 1.15rem;
+				color: var(--muted);
+				max-width: 460px;
+			}
+
+			/* A little "add your own photo" slot so the page looks complete without me
+       shipping a copyrighted photo. Drop your own image in and follow the note. */
+			.photo-slot {
+				margin-top: 28px;
+				display: inline-flex;
+				align-items: center;
+				gap: 14px;
+				padding: 14px 18px;
+				background: var(--surface);
+				border: 1px dashed var(--papaya);
+				border-radius: 14px;
+				font-family: 'Space Mono', monospace;
+				font-size: 0.78rem;
+				color: var(--muted);
+			}
+			.photo-slot .chip {
+				width: 46px;
+				height: 46px;
+				border-radius: 10px;
+				background: var(--papaya);
+				color: var(--bg);
+				display: grid;
+				place-items: center;
+				font-family: 'Anton', sans-serif;
+				font-size: 1.3rem;
+			}
+
+			/* ======================================================================
+       SECTION 4B — GALLERY (big portrait + helmet, real photos)
+       ====================================================================== */
+			.gallery-grid {
+				display: grid;
+				grid-template-columns: 1.4fr 1fr;
+				gap: 24px;
+				align-items: stretch;
+			}
+			.gallery-photo {
+				position: relative;
+				border-radius: 20px;
+				overflow: hidden;
+				border: 1px solid var(--line);
+				min-height: 420px;
+			}
+			.gallery-photo img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				object-position: top center;
+				display: block;
+			}
+			.gallery-photo .chip {
+				position: absolute;
+				top: 18px;
+				left: 18px;
+				width: 46px;
+				height: 46px;
+				border-radius: 10px;
+				background: var(--papaya);
+				color: var(--bg);
+				display: grid;
+				place-items: center;
+				font-family: 'Anton', sans-serif;
+				font-size: 1.3rem;
+				z-index: 2;
+			}
+			.gallery-caption {
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				padding: 22px 22px 18px;
+				background: linear-gradient(
+					to top,
+					rgba(0, 0, 0, 0.78),
+					transparent
+				);
+				color: #fff;
+			}
+			.gallery-caption .cap-title {
+				font-family: 'Anton', sans-serif;
+				font-size: 1.4rem;
+				text-transform: uppercase;
+				line-height: 1.1;
+			}
+			.gallery-caption .cap-sub {
+				font-family: 'Space Mono', monospace;
+				font-size: 0.72rem;
+				letter-spacing: 0.15em;
+				color: #d8d8db;
+				margin-top: 4px;
+			}
+			.gallery-side {
+				display: flex;
+				flex-direction: column;
+				gap: 24px;
+			}
+			.helmet-card {
+				background: var(--surface);
+				border: 1px solid var(--line);
+				border-radius: 20px;
+				overflow: hidden;
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+			.helmet-card img {
+				width: 100%;
+				aspect-ratio: 1 / 1;
+				object-fit: cover;
+				display: block;
+			}
+			.helmet-card .helmet-text {
+				padding: 18px 20px;
+			}
+			.helmet-card .helmet-text .eyebrow {
+				font-size: 0.68rem;
+			}
+			.helmet-card .helmet-text p {
+				margin-top: 8px;
+				font-size: 0.92rem;
+				color: var(--muted);
+			}
+			.photo-credit {
+				margin-top: 14px;
+				font-family: 'Space Mono', monospace;
+				font-size: 0.68rem;
+				letter-spacing: 0.04em;
+				color: var(--muted);
+			}
+			.photo-credit a {
+				color: var(--papaya);
+			}
+			[data-theme='papaya'] .photo-credit a {
+				color: var(--text);
+			}
+
+			/* ======================================================================
+       SECTION 5 — STAT LINE (telemetry-style, counts up on scroll)
+       ====================================================================== */
+			.stats {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 18px;
+			}
+			.stat {
+				background: var(--surface);
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				padding: 24px 20px;
+			}
+			.stat .num {
+				font-family: 'Anton', sans-serif;
+				font-size: clamp(2.4rem, 7vw, 3.6rem);
+				color: var(--papaya);
+				line-height: 1;
+			}
+			[data-theme='papaya'] .stat .num {
+				color: var(--text);
+			}
+			.stat .lbl {
+				font-family: 'Space Mono', monospace;
+				font-size: 0.72rem;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+				color: var(--muted);
+				margin-top: 10px;
+			}
+
+			/* ======================================================================
+       SECTION 5B — STANDINGS TABS (past 2 seasons, click to switch)
+       ====================================================================== */
+			.standings-tabs {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 24px;
+			}
+			.tab-btn {
+				font-family: 'Space Mono', monospace;
+				font-size: 0.8rem;
+				letter-spacing: 0.08em;
+				padding: 10px 22px;
+				background: transparent;
+				color: var(--muted);
+				border: 1px solid var(--line);
+				border-radius: 999px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+			.tab-btn:hover {
+				color: var(--text);
+				border-color: var(--papaya);
+			}
+			.tab-btn.active {
+				color: var(--bg);
+				background: var(--papaya);
+				border-color: var(--papaya);
+			}
+			[data-theme='papaya'] .tab-btn.active {
+				color: var(--bg);
+				background: var(--text);
+			}
+			.standings-panel {
+				display: none;
+			}
+			.standings-panel.active {
+				display: block;
+			}
+			.standings-panel p {
+				margin-top: 18px;
+				max-width: 68ch;
+				color: var(--muted);
+			}
+
+			/* ======================================================================
+       SECTION 6 — BIO
+       ====================================================================== */
+			.bio p {
+				max-width: 68ch;
+				margin-bottom: 16px;
+				color: var(--text);
+			}
+			.bio strong {
+				color: var(--papaya);
+			}
+			[data-theme='papaya'] .bio strong {
+				color: var(--text);
+			}
+
+			/* ======================================================================
+       SECTION 7 — FUN FACT GENERATOR
+       ====================================================================== */
+			.fact-card {
+				background: var(--surface);
+				border: 1px solid var(--line);
+				border-left: 5px solid var(--papaya);
+				border-radius: 14px;
+				padding: 32px;
+				min-height: 150px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+			.fact-card .fact-text {
+				font-size: 1.35rem;
+				font-weight: 600;
+			}
+			.fact-card .fact-tag {
+				font-family: 'Space Mono', monospace;
+				font-size: 0.72rem;
+				letter-spacing: 0.15em;
+				text-transform: uppercase;
+				color: var(--papaya);
+				margin-bottom: 12px;
+			}
+			[data-theme='papaya'] .fact-card .fact-tag {
+				color: var(--text);
+			}
+
+			/* Shared button style used by the fact generator + quiz */
+			.btn {
+				font-family: 'Space Mono', monospace;
+				font-weight: 700;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				font-size: 0.82rem;
+				margin-top: 22px;
+				padding: 13px 24px;
+				background: var(--papaya);
+				color: var(--bg);
+				border: none;
+				border-radius: 999px;
+				cursor: pointer;
+				transition:
+					transform 0.12s ease,
+					filter 0.2s ease;
+			}
+			[data-theme='papaya'] .btn {
+				background: var(--text);
+				color: var(--bg);
+			}
+			.btn:hover {
+				filter: brightness(1.08);
+			}
+			.btn:active {
+				transform: scale(0.97);
+			}
+
+			/* ======================================================================
+       SECTION 8 — QUIZ
+       ====================================================================== */
+			.quiz {
+				background: var(--surface);
+				border: 1px solid var(--line);
+				border-radius: 16px;
+				padding: 32px;
+			}
+			.q-count {
+				font-family: 'Space Mono', monospace;
+				font-size: 0.75rem;
+				color: var(--muted);
+				letter-spacing: 0.1em;
+			}
+			.q-text {
+				font-size: 1.3rem;
+				font-weight: 800;
+				margin: 10px 0 22px;
+			}
+			.options {
+				display: grid;
+				gap: 12px;
+			}
+			.option {
+				text-align: left;
+				padding: 15px 18px;
+				background: var(--bg);
+				color: var(--text);
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				font-family: 'Archivo', sans-serif;
+				font-size: 1rem;
+				cursor: pointer;
+				transition:
+					border-color 0.15s ease,
+					background 0.15s ease;
+			}
+			.option:hover:not(:disabled) {
+				border-color: var(--papaya);
+			}
+			.option.correct {
+				border-color: #35c46a;
+				background: color-mix(in srgb, #35c46a 16%, var(--bg));
+			}
+			.option.wrong {
+				border-color: #e0473a;
+				background: color-mix(in srgb, #e0473a 16%, var(--bg));
+			}
+			.option:disabled {
+				cursor: default;
+			}
+			.quiz-result {
+				margin-top: 22px;
+				font-size: 1.1rem;
+				font-weight: 600;
+				min-height: 1.6em;
+			}
+
+			/* ======================================================================
+       SECTION 9 — FOOTER
+       ====================================================================== */
+			footer {
+				padding: 40px 0 60px;
+				border-top: 1px solid var(--line);
+				font-family: 'Space Mono', monospace;
+				font-size: 0.78rem;
+				color: var(--muted);
+				display: flex;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 12px;
+			}
+			footer a {
+				color: var(--papaya);
+				text-decoration: none;
+			}
+			[data-theme='papaya'] footer a {
+				color: var(--text);
+			}
+
+			/* ======================================================================
+       SECTION 10 — RESPONSIVE (make it work on phones)
+       ====================================================================== */
+			@media (max-width: 720px) {
+				.stats {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				section {
+					padding: 60px 0;
+				}
+				.hero-number {
+					opacity: 0.08;
+				}
+				.gallery-grid {
+					grid-template-columns: 1fr;
+				}
+				.gallery-photo {
+					min-height: 320px;
+				}
+				.standings-tabs {
+					flex-wrap: wrap;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- ===================== NAV + THEME SWITCHER ===================== -->
+		<div class="wrap">
+			<header class="nav">
+				<div class="brand">PIASTRI<span>·81</span></div>
+				<!-- These buttons call setTheme(...) which lives in the script below -->
+				<nav class="themes" aria-label="Colour theme">
+					<button data-theme-btn="race" class="active">
+						Night Race
+					</button>
+					<button data-theme-btn="day">Daylight</button>
+					<button data-theme-btn="papaya">Papaya</button>
+				</nav>
+			</header>
+		</div>
+
+		<!-- ===================== HERO ===================== -->
+		<div class="hero">
+			<div class="hero-number" aria-hidden="true">81</div>
+			<div class="wrap">
+				<div class="hero-content">
+					<p class="flag">🇦🇺 MELBOURNE, AUSTRALIA · McLAREN F1</p>
+					<h1>Oscar<span class="last">Piastri</span></h1>
+					<p class="tagline">
+						The calm one in the cockpit. A radio-control kid from
+						Melbourne who charged up the ladder and turned "quiet"
+						into a superpower.
+					</p>
+
+					<video
+						src="piastri.mp4"
+						autoplay
+						muted
+						loop
+						playsinline
+						style="margin-top:28px;border-radius:14px;max-width:320px;width:100%;"
+					></video>
+				</div>
+			</div>
+		</div>
+
+		<!-- ===================== GALLERY (big photo + helmet) ===================== -->
+		<section>
+			<div class="wrap">
+				<p class="eyebrow">In the frame</p>
+				<h2 class="title">Home turf</h2>
+				<div class="gallery-grid">
+					<div class="gallery-photo">
+						<div class="chip">81</div>
+						<img
+							src="oscar-melbourne-walk.jpg"
+							alt="Oscar Piastri at the Melbourne Walk during the 2026 Australian Grand Prix"
+						/>
+						<div class="gallery-caption">
+							<div class="cap-title">Melbourne Walk, 2026</div>
+							<div class="cap-sub">
+								ALBERT PARK · AUSTRALIAN GRAND PRIX
+							</div>
+						</div>
+					</div>
+					<div class="gallery-side">
+						<div class="helmet-card">
+							<img
+								src="piastri-helmet.jpg"
+								alt="Oscar Piastri's 2024 racing helmet"
+							/>
+							<div class="helmet-text">
+								<p class="eyebrow">The lid</p>
+								<p>
+									A design carried over from his karting
+									days: red and blue base colours,
+									fluorescent yellow details, and the flag
+									of Australia — barely changed since he
+									was racing for regional titles as a kid.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<p class="photo-credit">
+					Photos: Yu Chu Chin and Liauzh · Wikimedia Commons ·
+					<a
+						href="https://creativecommons.org/licenses/by-sa/4.0/"
+						target="_blank"
+						rel="noopener"
+						>CC BY-SA 4.0</a
+					>
+				</p>
+			</div>
+		</section>
+
+		<!-- ===================== STATS ===================== -->
+		<section>
+			<div class="wrap">
+				<p class="eyebrow">Career Telemetry · 2023–2026</p>
+				<h2 class="title">By the numbers</h2>
+				<!-- data-target = the real number. JS counts up TO this value on scroll. -->
+				<div class="stats" id="stats">
+					<div class="stat">
+						<div class="num" data-target="9">0</div>
+						<div class="lbl">Grand Prix wins</div>
+					</div>
+					<div class="stat">
+						<div class="num" data-target="28">0</div>
+						<div class="lbl">Podiums</div>
+					</div>
+					<div class="stat">
+						<div class="num" data-target="6">0</div>
+						<div class="lbl">Pole positions</div>
+					</div>
+					<div class="stat">
+						<div class="num" data-target="3">0</div>
+						<div class="lbl">Junior titles</div>
+					</div>
+				</div>
+				<p
+					style="
+						margin-top: 16px;
+						font-family: 'Space Mono', monospace;
+						font-size: 0.72rem;
+						color: var(--muted);
+					"
+				>
+					(Update these numbers as the season goes — they're the
+					data-target values in the HTML.)
+				</p>
+			</div>
+		</section>
+
+		<!-- ===================== STANDINGS (past 2 seasons) ===================== -->
+		<section>
+			<div class="wrap">
+				<p class="eyebrow">Championship history</p>
+				<h2 class="title">Last two seasons</h2>
+				<!-- Tab buttons toggle .standings-panel visibility via JS below -->
+				<div class="standings-tabs">
+					<button data-tab-btn="2025" class="tab-btn active">
+						2025
+					</button>
+					<button data-tab-btn="2024" class="tab-btn">2024</button>
+				</div>
+
+				<div class="standings-panel active" data-tab-panel="2025">
+					<div class="stats">
+						<div class="stat">
+							<div class="num">3rd</div>
+							<div class="lbl">Championship</div>
+						</div>
+						<div class="stat">
+							<div class="num">410</div>
+							<div class="lbl">Points</div>
+						</div>
+						<div class="stat">
+							<div class="num">7</div>
+							<div class="lbl">Wins</div>
+						</div>
+						<div class="stat">
+							<div class="num">16</div>
+							<div class="lbl">Podiums</div>
+						</div>
+					</div>
+					<p>
+						A three-way title fight with teammate Lando Norris
+						and Max Verstappen. Piastri led the standings for
+						much of the season before finishing third, just 13
+						points off the championship — both his win and
+						podium tallies are Australian records.
+					</p>
+				</div>
+
+				<div class="standings-panel" data-tab-panel="2024">
+					<div class="stats">
+						<div class="stat">
+							<div class="num">4th</div>
+							<div class="lbl">Championship</div>
+						</div>
+						<div class="stat">
+							<div class="num">292</div>
+							<div class="lbl">Points</div>
+						</div>
+						<div class="stat">
+							<div class="num">2</div>
+							<div class="lbl">Wins</div>
+						</div>
+						<div class="stat">
+							<div class="num">8</div>
+							<div class="lbl">Podiums</div>
+						</div>
+					</div>
+					<p>
+						His breakthrough year: maiden Grand Prix wins in
+						Hungary and Azerbaijan, and a core part of McLaren
+						winning their first Constructors' Championship since
+						1998.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- ===================== BIO ===================== -->
+		<section class="bio">
+			<div class="wrap">
+				<p class="eyebrow">Who is he</p>
+				<h2 class="title">Melbourne to the grid</h2>
+				<p>
+					Oscar Jack Piastri was born on
+					<strong>6 April 2001</strong> in Melbourne — a stone's throw
+					from the Albert Park circuit that hosts the Australian Grand
+					Prix. He didn't start in go-karts. He started in
+					<strong>remote-control car racing</strong>, winning a
+					national title at just nine years old before switching to
+					karts at ten.
+				</p>
+				<p>
+					Then came one of the cleanest runs junior motorsport has
+					ever seen: three championships in three straight years — the
+					<strong>2019 Formula Renault Eurocup</strong>, the
+					<strong>2020 FIA Formula 3</strong> title, and the
+					<strong>2021 FIA Formula 2</strong> title (which he won by
+					more than 50 points).
+				</p>
+				<p>
+					He made his Formula 1 debut with
+					<strong>McLaren in 2023</strong>, taking Rookie of the Year.
+					His first Grand Prix win came at the
+					<strong>2024 Hungarian Grand Prix</strong>, and he was a key
+					part of McLaren winning back-to-back Constructors'
+					Championships in 2024 and 2025. In 2025 he racked up seven
+					wins and 16 podiums — both records for an Australian driver.
+				</p>
+			</div>
+		</section>
+
+		<!-- ===================== FUN FACT GENERATOR ===================== -->
+		<section>
+			<div class="wrap">
+				<p class="eyebrow">Interactive · Random</p>
+				<h2 class="title">Fun fact machine</h2>
+				<div class="fact-card">
+					<div class="fact-tag" id="factTag">Fact #1</div>
+					<div class="fact-text" id="factText">
+						Tap the button for a random Piastri fact.
+					</div>
+				</div>
+				<button class="btn" id="factBtn">Give me a fact 🏎️</button>
+			</div>
+		</section>
+
+		<!-- ===================== QUIZ ===================== -->
+		<section>
+			<div class="wrap">
+				<p class="eyebrow">Interactive · Test yourself</p>
+				<h2 class="title">Superfan quiz</h2>
+				<div class="quiz">
+					<div class="q-count" id="qCount">Question 1 / 4</div>
+					<div class="q-text" id="qText">Loading…</div>
+					<div class="options" id="qOptions"></div>
+					<div class="quiz-result" id="qResult"></div>
+					<button class="btn" id="qNext" style="display: none">
+						Next question →
+					</button>
+				</div>
+			</div>
+		</section>
+
+		<!-- ===================== FOOTER ===================== -->
+		<div class="wrap">
+			<footer>
+				<span
+					>Fan page · IS216 assignment · not affiliated with Oscar
+					Piastri or McLaren</span
+				>
+				<span
+					>Inspired by
+					<a
+						href="https://www.oscarpiastri.com/"
+						target="_blank"
+						rel="noopener"
+						>oscarpiastri.com</a
+					></span
+				>
+			</footer>
+		</div>
+
+		<!-- ======================================================================
+       SECTION 11 — JAVASCRIPT (all the interactivity)
+       Runs after the HTML above has loaded because the <script> is at the end.
+       ====================================================================== -->
+		<script>
+			'use strict';
+
+			/* ---------- FEATURE 1: THEME SWITCHER ---------- */
+			// Grab every theme button, and the <html> element we set data-theme on.
+			const themeButtons = document.querySelectorAll('[data-theme-btn]');
+			const root = document.documentElement; // this is the <html> tag
+
+			themeButtons.forEach(function (button) {
+				button.addEventListener('click', function () {
+					const chosen = button.getAttribute('data-theme-btn');
+					root.setAttribute('data-theme', chosen); // CSS reacts to this
+					// update which button looks "active"
+					themeButtons.forEach(function (b) {
+						b.classList.remove('active');
+					});
+					button.classList.add('active');
+				});
+			});
+
+			/* ---------- FEATURE 1B: STANDINGS TABS (2024 / 2025) ---------- */
+			const tabButtons = document.querySelectorAll('[data-tab-btn]');
+			const tabPanels = document.querySelectorAll('[data-tab-panel]');
+
+			tabButtons.forEach(function (button) {
+				button.addEventListener('click', function () {
+					const year = button.getAttribute('data-tab-btn');
+
+					tabButtons.forEach(function (b) {
+						b.classList.remove('active');
+					});
+					button.classList.add('active');
+
+					tabPanels.forEach(function (panel) {
+						panel.classList.toggle(
+							'active',
+							panel.getAttribute('data-tab-panel') === year,
+						);
+					});
+				});
+			});
+
+			/* ---------- FEATURE 2: FUN FACT GENERATOR ---------- */
+			const facts = [
+				'He races with the number 81. He first used 11 in karting, but switched to 81 after a rival started using his number — and just kept it.',
+				'Before karts, Oscar was a remote-control car racer, winning a national RC title at age 9.',
+				'He is the 15th Australian ever to start a Formula 1 Grand Prix.',
+				'His junior record is absurd: Formula Renault Eurocup, FIA F3, and FIA F2 titles in three straight years.',
+				'He won the 2021 F2 championship by more than 50 points.',
+				'His first F1 win came at the 2024 Hungarian Grand Prix.',
+				'In 2025 he scored 7 wins and 16 podiums — both records for an Australian driver.',
+				"He's known on the grid for being ice-cool and unflappable under pressure — hence the 'quiet assassin' reputation.",
+			];
+
+			const factText = document.getElementById('factText');
+			const factTag = document.getElementById('factTag');
+			const factBtn = document.getElementById('factBtn');
+			let lastFact = -1; // remember the last one so we don't repeat back-to-back
+
+			factBtn.addEventListener('click', function () {
+				let i;
+				do {
+					i = Math.floor(Math.random() * facts.length); // random index
+				} while (i === lastFact && facts.length > 1);
+				lastFact = i;
+				factText.textContent = facts[i];
+				factTag.textContent = 'Fact #' + (i + 1);
+			});
+
+			/* ---------- FEATURE 3: QUIZ ---------- */
+			const questions = [
+				{
+					q: 'What number does Oscar Piastri race with?',
+					options: ['11', '81', '4', '27'],
+					answer: 1,
+				},
+				{
+					q: 'Which team does he drive for in Formula 1?',
+					options: ['Ferrari', 'Red Bull', 'McLaren', 'Mercedes'],
+					answer: 2,
+				},
+				{
+					q: 'Where was Piastri born?',
+					options: ['Sydney', 'Melbourne', 'Perth', 'Brisbane'],
+					answer: 1,
+				},
+				{
+					q: 'At which 2024 Grand Prix did he take his FIRST F1 win?',
+					options: ['Monaco', 'Italian', 'Hungarian', 'British'],
+					answer: 2,
+				},
+			];
+
+			let current = 0; // which question we're on
+			let score = 0; // how many correct so far
+
+			const qCount = document.getElementById('qCount');
+			const qText = document.getElementById('qText');
+			const qOptions = document.getElementById('qOptions');
+			const qResult = document.getElementById('qResult');
+			const qNext = document.getElementById('qNext');
+
+			// Draw the current question on screen
+			function showQuestion() {
+				const item = questions[current];
+				qCount.textContent =
+					'Question ' + (current + 1) + ' / ' + questions.length;
+				qText.textContent = item.q;
+				qResult.textContent = '';
+				qNext.style.display = 'none';
+				qOptions.innerHTML = ''; // clear old buttons
+
+				// build one button per option
+				item.options.forEach(function (optionText, index) {
+					const btn = document.createElement('button');
+					btn.className = 'option';
+					btn.textContent = optionText;
+					btn.addEventListener('click', function () {
+						checkAnswer(index);
+					});
+					qOptions.appendChild(btn);
+				});
+			}
+
+			// Runs when the user picks an option
+			function checkAnswer(picked) {
+				const item = questions[current];
+				const optionButtons = qOptions.querySelectorAll('.option');
+
+				optionButtons.forEach(function (btn, index) {
+					btn.disabled = true; // lock answers once chosen
+					if (index === item.answer) btn.classList.add('correct');
+					if (index === picked && picked !== item.answer)
+						btn.classList.add('wrong');
+				});
+
+				if (picked === item.answer) {
+					score++;
+					qResult.textContent = '✅ Correct!';
+				} else {
+					qResult.textContent =
+						'❌ It was: ' + item.options[item.answer];
+				}
+
+				// show Next, or finish
+				if (current < questions.length - 1) {
+					qNext.style.display = 'inline-block';
+				} else {
+					qResult.textContent +=
+						'  ·  Final score: ' + score + ' / ' + questions.length;
+					qNext.textContent = 'Restart quiz ↻';
+					qNext.style.display = 'inline-block';
+				}
+			}
+
+			qNext.addEventListener('click', function () {
+				if (current < questions.length - 1) {
+					current++;
+					showQuestion();
+				} else {
+					// restart
+					current = 0;
+					score = 0;
+					showQuestion();
+					qNext.textContent = 'Next question →';
+				}
+			});
+
+			showQuestion(); // draw the first question on page load
+
+			/* ---------- FEATURE 4: STAT COUNTERS THAT COUNT UP ON SCROLL ---------- */
+			// IntersectionObserver = "tell me when this element scrolls into view".
+			const statNums = document.querySelectorAll('#stats .num');
+
+			function animateCount(el) {
+				const target = Number(el.getAttribute('data-target'));
+				let value = 0;
+				const step = Math.max(1, Math.ceil(target / 30)); // ~30 frames
+				const timer = setInterval(function () {
+					value += step;
+					if (value >= target) {
+						value = target;
+						clearInterval(timer);
+					}
+					el.textContent = value;
+				}, 30);
+			}
+
+			const observer = new IntersectionObserver(
+				function (entries) {
+					entries.forEach(function (entry) {
+						if (entry.isIntersecting) {
+							animateCount(entry.target);
+							observer.unobserve(entry.target); // only animate once
+						}
+					});
+				},
+				{ threshold: 0.6 },
+			);
+
+			statNums.forEach(function (el) {
+				observer.observe(el);
+			});
+		</script>
+	</body>
+</html>
